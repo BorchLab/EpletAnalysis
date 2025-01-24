@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.57">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Patricia Hernandex">
+<meta name="author" content="Nick Borcherding">
+
+<title>Eplet Comparison Workflow</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="EpletWorkflow_files/libs/clipboard/clipboard.min.js"></script>
+<script src="EpletWorkflow_files/libs/quarto-html/quarto.js"></script>
+<script src="EpletWorkflow_files/libs/quarto-html/popper.min.js"></script>
+<script src="EpletWorkflow_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="EpletWorkflow_files/libs/quarto-html/anchor.min.js"></script>
+<link href="EpletWorkflow_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="EpletWorkflow_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="EpletWorkflow_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="EpletWorkflow_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="EpletWorkflow_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Eplet Comparison Workflow</h1>
+</div>
+
+
+<div class="quarto-title-meta-author">
+  <div class="quarto-title-meta-heading">Authors</div>
+  <div class="quarto-title-meta-heading">Affiliation</div>
+  
+    <div class="quarto-title-meta-contents">
+    <p class="author">Patricia Hernandex <a href="mailto:hernandez.p@wustl.edu" class="quarto-title-author-email"><i class="bi bi-envelope"></i></a> </p>
+  </div>
+  <div class="quarto-title-meta-contents">
+        <p class="affiliation">
+            Washington University in St.&nbsp;Louis, School of Medicine, St.&nbsp;Louis, MO, USA
+          </p>
+      </div>
+    <div class="quarto-title-meta-contents">
+    <p class="author">Nick Borcherding <a href="mailto:borcherding.n@wustl.edu" class="quarto-title-author-email"><i class="bi bi-envelope"></i></a> </p>
+  </div>
+  <div class="quarto-title-meta-contents">
+        <p class="affiliation">
+            Washington University in St.&nbsp;Louis, School of Medicine, St.&nbsp;Louis, MO, USA
+          </p>
+      </div>
+  </div>
+
+<div class="quarto-title-meta">
+
+      
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="loading-library" class="level2">
+<h2 class="anchored" data-anchor-id="loading-library">Loading Library</h2>
+<p>This will load the libraries necessary to run the analysis. If the libraries/packages are not installed, this code will install them before loading them.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>required_libraries <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"dplyr"</span>, <span class="st">"data.table"</span>, <span class="st">"tidyr"</span>, <span class="st">"janitor"</span>, <span class="st">"stringr"</span>, <span class="st">"venn"</span>,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"lubridate"</span>, <span class="st">"readxl"</span>, <span class="st">"openxlsx"</span>, <span class="st">"tidyverse"</span>, <span class="st">"hrbrthemes"</span>,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"proustr"</span>, <span class="st">"VennDiagram"</span>, <span class="st">"ComplexUpset"</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Function to check, install if needed, and load libraries</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>load_libraries <span class="ot">&lt;-</span> <span class="cf">function</span>(libraries) {</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (lib <span class="cf">in</span> libraries) {</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="sc">!</span><span class="fu">requireNamespace</span>(lib, <span class="at">quietly =</span> <span class="cn">TRUE</span>)) {</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>      <span class="fu">install.packages</span>(lib, <span class="at">dependencies =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">library</span>(lib, <span class="at">character.only =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Execute the function</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="fu">load_libraries</span>(required_libraries)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="loading-functions" class="level2">
+<h2 class="anchored" data-anchor-id="loading-functions">Loading Functions</h2>
+<p>These are custom functions written for the analysis to assist in loading and plotting the data. More information can be found in the github repository under the R folder.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"./R/load_data.R"</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"./R/utils.R"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"./R/calculate_sum.R"</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"./R/generate_venn_diagram.R"</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"./R/generate_upset_plot.R"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="data-formats" class="level2">
+<h2 class="anchored" data-anchor-id="data-formats">Data Formats</h2>
+<p>The most important step before running the analysis is to ensure that the data is consistently formatted. Much of the functions are specific to the column names and structure of the individual cells within the excel file or the document.</p>
+<section id="sab-assay" class="level3">
+<h3 class="anchored" data-anchor-id="sab-assay">SAB Assay</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>SAB <span class="ot">&lt;-</span> <span class="fu">read_xlsx</span>(<span class="st">"data/SAB_Class_I_Lot_14_20221212.xlsx"</span>, <span class="at">sheet =</span> <span class="dv">1</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(SAB)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 11
+  Column1 `Bead ID` `Antigen ID` `Molecular Typing` `Serological Typing`
+    &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;        &lt;chr&gt;              &lt;chr&gt;               
+1       1         1 NC           NA                 N/A                 
+2       2         2 PC           NA                 N/A                 
+3       3         3 rA0101       A*01:01            A1                  
+4       4         4 rA0201       A*02:01            A2                  
+5       5         5 rA0203       A*02:03            A2                  
+6       6         6 rA0206       A*02:06            A2                  
+# ℹ 6 more variables: `*W6/32` &lt;dbl&gt;, Results &lt;lgl&gt;, Column8 &lt;chr&gt;,
+#   Column9 &lt;chr&gt;, Column10 &lt;chr&gt;, Column11 &lt;chr&gt;</code></pre>
+</div>
+</div>
+</section>
+<section id="pra-assay" class="level3">
+<h3 class="anchored" data-anchor-id="pra-assay">PRA Assay</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>PRA <span class="ot">&lt;-</span> <span class="fu">read_xlsx</span>(<span class="st">"data/PRA_Class_I_Lot_020_20221212.xlsx"</span>, <span class="at">sheet =</span> <span class="dv">1</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(PRA)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 11
+  Order `Bead ID` `Antigen ID` `A Left` `A Right`    `B Left` `B Right` `C Left`
+  &lt;dbl&gt; &lt;chr&gt;     &lt;chr&gt;        &lt;chr&gt;    &lt;chr&gt;        &lt;chr&gt;    &lt;chr&gt;     &lt;chr&gt;   
+1     1 1         NC           N/A      N/A          N/A      N/A       N/A     
+2     2 2         PC           N/A      N/A          N/A      N/A       N/A     
+3     3 3         C4966        A*02:01  A*02:07      B*46:01  X         C*01:02 
+4     4 4         E19109       A*01:01  A*23:01      B*49:01  B*55:01   C*03:03 
+5     5 5         G0142        A*11:02  A*24:02      B*27:06  B*40:01   C*03:04 
+6     6 6         E5482        A*11:01  A*24:02/50/… B*54:01  B*59:01   C*01:02 
+# ℹ 3 more variables: `C Right` &lt;chr&gt;, `Serological Typing` &lt;chr&gt;,
+#   Results &lt;lgl&gt;</code></pre>
+</div>
+</div>
+</section>
+<section id="mix-assay" class="level3">
+<h3 class="anchored" data-anchor-id="mix-assay">Mix Assay</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>Mix <span class="ot">&lt;-</span> <span class="fu">read_xlsx</span>(<span class="st">"data/LSM12NC23_024_01.xlsx"</span>, <span class="at">sheet =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>New names:
+• `` -&gt; `...4`
+• `` -&gt; `...6`</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(Mix)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 8
+   Bead `Pos Ctr` Abbreviated Specificit…¹ ...4  `Recognition Site` ...6  Cutoff
+  &lt;dbl&gt; &lt;lgl&gt;     &lt;chr&gt;                    &lt;lgl&gt; &lt;lgl&gt;              &lt;lgl&gt; &lt;lgl&gt; 
+1     1 NA        -,-,-,-,-,-,-,-          NA    NA                 NA    NA    
+2     2 NA        -,-,-,-,-,-,-,-          NA    NA                 NA    NA    
+3     6 NA        A1,A80,B18,B50,Bw6,-,Cw… NA    NA                 NA    NA    
+4     6 NA        A1,A29,B8,B45,Bw6,-,Cw6… NA    NA                 NA    NA    
+5     6 NA        A1,A69,B8,B55,Bw6,-,Cw1… NA    NA                 NA    NA    
+6     9 NA        A11,A24,B35,B62,Bw6,-,C… NA    NA                 NA    NA    
+# ℹ abbreviated name: ¹​`Abbreviated Specificity`
+# ℹ 1 more variable: Specificity &lt;chr&gt;</code></pre>
+</div>
+</div>
+</section>
+<section id="explex-assay" class="level3">
+<h3 class="anchored" data-anchor-id="explex-assay">ExPlex Assay</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>ExPlex <span class="ot">&lt;-</span> <span class="fu">read_xlsx</span>(<span class="st">"data/ExPlex_classI_II.xlsx"</span>, <span class="at">sheet =</span> <span class="dv">1</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(ExPlex)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 1
+  Molecular.Typing
+  &lt;chr&gt;           
+1 A*01:02         
+2 A*02:10         
+3 A*02:05         
+4 A*02:07         
+5 A*02:18         
+6 A*26:02         </code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="figure-1-allele-counting" class="level2">
+<h2 class="anchored" data-anchor-id="figure-1-allele-counting">Figure 1: Allele Counting</h2>
+<p>The following code will load all the assay information and automatically format them with the <code>load_XX_data()</code> functions. From there, we can count the alleles.</p>
+<section id="class-i-alleles" class="level3">
+<h3 class="anchored" data-anchor-id="class-i-alleles">Class I Alleles</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>sab <span class="ot">&lt;-</span> <span class="fu">process_sab_data</span>(<span class="at">file =</span> <span class="st">"./data/SAB_Class_I_Lot_14_20221212.xlsx"</span>, <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>)) </span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>pra <span class="ot">&lt;-</span> <span class="fu">process_pra_data</span>(<span class="at">file =</span> <span class="st">"./data/PRA_Class_I_Lot_020_20221212.xlsx"</span>, <span class="dv">1</span>) </span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>mix <span class="ot">&lt;-</span> <span class="fu">process_mix_data</span>(<span class="at">file =</span> <span class="st">"./data/LSM12NC23_024_01.xlsx"</span>, <span class="dv">1</span>) </span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>explex <span class="ot">&lt;-</span> <span class="fu">process_explex_data</span>(<span class="at">file =</span> <span class="st">"./data/ExPlex_classI_II.xlsx"</span>, <span class="dv">1</span>)</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="co">#Remove non-type-I from Mix</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>mix <span class="ot">&lt;-</span> mix[<span class="fu">grepl</span>(<span class="st">"A_|B_|C_"</span>, mix<span class="sc">$</span>values),]</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>b <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">SAB =</span> <span class="fu">unique</span>(sab<span class="sc">$</span>Molecular.Typing),</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">PRA =</span> <span class="fu">unique</span>(pra<span class="sc">$</span>values),</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">Mixed =</span> <span class="fu">unique</span>(mix<span class="sc">$</span>values),</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">ExPlex =</span> <span class="fu">unique</span>(explex<span class="sc">$</span>Molecular.Typing)</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a binary membership matrix</span></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>all_elements <span class="ot">&lt;-</span> <span class="fu">unique</span>(<span class="fu">unlist</span>(b))</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>membership_matrix <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">element =</span> all_elements,</span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">SAB =</span> all_elements <span class="sc">%in%</span> b<span class="sc">$</span>SAB,</span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">PRA =</span> all_elements <span class="sc">%in%</span> b<span class="sc">$</span>PRA,</span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">Mixed =</span> all_elements <span class="sc">%in%</span> b<span class="sc">$</span>Mix,</span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">ExPlex =</span> all_elements <span class="sc">%in%</span> b<span class="sc">$</span>ExPlex</span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert logical values to binary</span></span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>membership_matrix <span class="ot">&lt;-</span> membership_matrix <span class="sc">%&gt;%</span></span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(element, ExPlex, Mixed, PRA, SAB)</span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate the UpSet plot</span></span>
+<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a>upset_data <span class="ot">&lt;-</span> membership_matrix <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span>element)</span>
+<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a>upset_data <span class="ot">&lt;-</span> upset_data[, <span class="fu">c</span>(<span class="st">"ExPlex"</span>, <span class="st">"Mixed"</span>, <span class="st">"PRA"</span>, <span class="st">"SAB"</span>)]</span>
+<span id="cb13-34"><a href="#cb13-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-35"><a href="#cb13-35" aria-hidden="true" tabindex="-1"></a><span class="co"># Then specify the same order in the `intersect` argument:</span></span>
+<span id="cb13-36"><a href="#cb13-36" aria-hidden="true" tabindex="-1"></a><span class="fu">upset</span>(</span>
+<span id="cb13-37"><a href="#cb13-37" aria-hidden="true" tabindex="-1"></a>  upset_data,</span>
+<span id="cb13-38"><a href="#cb13-38" aria-hidden="true" tabindex="-1"></a>  <span class="at">intersect =</span> <span class="fu">colnames</span>(upset_data), <span class="co"># Now in alphabetical order</span></span>
+<span id="cb13-39"><a href="#cb13-39" aria-hidden="true" tabindex="-1"></a>  <span class="at">sort_intersections_by=</span><span class="st">'degree'</span>,</span>
+<span id="cb13-40"><a href="#cb13-40" aria-hidden="true" tabindex="-1"></a>  <span class="at">base_annotations =</span> <span class="fu">list</span>(<span class="st">'Number of</span><span class="sc">\n</span><span class="st">Antigens'</span> <span class="ot">=</span> <span class="fu">intersection_size</span>()),</span>
+<span id="cb13-41"><a href="#cb13-41" aria-hidden="true" tabindex="-1"></a>  <span class="at">themes =</span> <span class="fu">upset_default_themes</span>(<span class="at">text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>)), </span>
+<span id="cb13-42"><a href="#cb13-42" aria-hidden="true" tabindex="-1"></a>  <span class="at">set_sizes =</span> <span class="cn">FALSE</span>, </span>
+<span id="cb13-43"><a href="#cb13-43" aria-hidden="true" tabindex="-1"></a>  <span class="at">sort_sets =</span> <span class="cn">FALSE</span> </span>
+<span id="cb13-44"><a href="#cb13-44" aria-hidden="true" tabindex="-1"></a>) <span class="sc">+</span> </span>
+<span id="cb13-45"><a href="#cb13-45" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.title.x =</span> <span class="fu">element_blank</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="EpletWorkflow_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">'outputs/viz/Figure1_ClassI.png'</span>, <span class="at">width =</span> <span class="dv">8</span>, <span class="at">height =</span> <span class="dv">6</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="class-ii-alleles" class="level3">
+<h3 class="anchored" data-anchor-id="class-ii-alleles">Class II Alleles</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>sab <span class="ot">&lt;-</span> <span class="fu">process_sab_data</span>(<span class="at">file =</span> <span class="st">"./data/SAB_ClassII_Lot_15_20221212.xlsx"</span>, <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>))[<span class="sc">-</span><span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>),]</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>pra <span class="ot">&lt;-</span> <span class="fu">process_pra_data</span>(<span class="at">file =</span> <span class="st">"./data/PRA_Class_II_Lot_019_20221212.xlsx"</span>, <span class="dv">1</span>)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>mix <span class="ot">&lt;-</span> <span class="fu">process_mix_data</span>(<span class="at">file =</span> <span class="st">"./data/LSM12NC23_024_01.xlsx"</span>, <span class="dv">1</span>) </span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>explex <span class="ot">&lt;-</span> <span class="fu">process_explex_data</span>(<span class="at">file =</span> <span class="st">"./data/ExPlex_classI_II.xlsx"</span>, <span class="dv">2</span>)</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="co">#Remove type-I from Mix</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>mix <span class="ot">&lt;-</span> mix[<span class="sc">!</span><span class="fu">grepl</span>(<span class="st">"A_|B_|C_"</span>, mix<span class="sc">$</span>values),]</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>b <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">SAB =</span> <span class="fu">unique</span>(sab<span class="sc">$</span>Molecular.Typing),</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">PRA =</span> <span class="fu">unique</span>(pra<span class="sc">$</span>values),</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">Mixed =</span> <span class="fu">unique</span>(mix<span class="sc">$</span>values),</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">ExPlex =</span> <span class="fu">unique</span>(explex<span class="sc">$</span>Molecular.Typing)</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a binary membership matrix</span></span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>all_elements <span class="ot">&lt;-</span> <span class="fu">unique</span>(<span class="fu">unlist</span>(b))</span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>membership_matrix <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">element =</span> all_elements,</span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">SAB =</span> all_elements <span class="sc">%in%</span> b<span class="sc">$</span>SAB,</span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">PRA =</span> all_elements <span class="sc">%in%</span> b<span class="sc">$</span>PRA,</span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">Mixed =</span> all_elements <span class="sc">%in%</span> b<span class="sc">$</span>Mix,</span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">ExPlex =</span> all_elements <span class="sc">%in%</span> b<span class="sc">$</span>ExPlex</span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert logical values to binary</span></span>
+<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a>membership_matrix <span class="ot">&lt;-</span> membership_matrix <span class="sc">%&gt;%</span></span>
+<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(element, ExPlex, Mixed, PRA, SAB)</span>
+<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate the UpSet plot</span></span>
+<span id="cb15-31"><a href="#cb15-31" aria-hidden="true" tabindex="-1"></a>upset_data <span class="ot">&lt;-</span> membership_matrix <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span>element)</span>
+<span id="cb15-32"><a href="#cb15-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-33"><a href="#cb15-33" aria-hidden="true" tabindex="-1"></a>upset_data <span class="ot">&lt;-</span> upset_data[, <span class="fu">c</span>(<span class="st">"ExPlex"</span>, <span class="st">"Mixed"</span>, <span class="st">"PRA"</span>, <span class="st">"SAB"</span>)]</span>
+<span id="cb15-34"><a href="#cb15-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-35"><a href="#cb15-35" aria-hidden="true" tabindex="-1"></a><span class="co"># Then specify the same order in the `intersect` argument:</span></span>
+<span id="cb15-36"><a href="#cb15-36" aria-hidden="true" tabindex="-1"></a><span class="fu">upset</span>(</span>
+<span id="cb15-37"><a href="#cb15-37" aria-hidden="true" tabindex="-1"></a>  upset_data,</span>
+<span id="cb15-38"><a href="#cb15-38" aria-hidden="true" tabindex="-1"></a>  <span class="at">intersect =</span> <span class="fu">colnames</span>(upset_data),<span class="co"># Now in alphabetical order</span></span>
+<span id="cb15-39"><a href="#cb15-39" aria-hidden="true" tabindex="-1"></a>  <span class="at">sort_intersections_by=</span><span class="st">'degree'</span>,</span>
+<span id="cb15-40"><a href="#cb15-40" aria-hidden="true" tabindex="-1"></a>  <span class="at">base_annotations =</span> <span class="fu">list</span>(<span class="st">'Number of</span><span class="sc">\n</span><span class="st">Antigens'</span> <span class="ot">=</span> <span class="fu">intersection_size</span>()),</span>
+<span id="cb15-41"><a href="#cb15-41" aria-hidden="true" tabindex="-1"></a>  <span class="at">themes =</span> <span class="fu">upset_default_themes</span>(<span class="at">text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>)), </span>
+<span id="cb15-42"><a href="#cb15-42" aria-hidden="true" tabindex="-1"></a>  <span class="at">set_sizes =</span> <span class="cn">FALSE</span>, </span>
+<span id="cb15-43"><a href="#cb15-43" aria-hidden="true" tabindex="-1"></a>  <span class="at">sort_sets =</span> <span class="cn">FALSE</span> </span>
+<span id="cb15-44"><a href="#cb15-44" aria-hidden="true" tabindex="-1"></a>) <span class="sc">+</span> </span>
+<span id="cb15-45"><a href="#cb15-45" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.title.x =</span> <span class="fu">element_blank</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="EpletWorkflow_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">'outputs/viz/Figure1_ClassII.png'</span>, <span class="at">width =</span> <span class="dv">8</span>, <span class="at">height =</span> <span class="dv">6</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="figure-23-eplet-counting" class="level2">
+<h2 class="anchored" data-anchor-id="figure-23-eplet-counting">Figure 2/3: Eplet Counting</h2>
+<p>Here we are going to calculate the respective eplet load within the individual assays. For each assay, we use the <code>calculate_sum()</code> function to add up the unique eplets represented by the alleles within the assay.</p>
+<section id="class-i-eplets" class="level3">
+<h3 class="anchored" data-anchor-id="class-i-eplets">Class I Eplets</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load and preprocess data</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">process_hla_registry</span>(<span class="at">file =</span> <span class="st">"./data/HMM-CL01-0620-CAT-00.xlsx"</span>, <span class="dv">1</span>)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>sab <span class="ot">&lt;-</span> <span class="fu">process_sab_data</span>(<span class="at">file =</span> <span class="st">"./data/SAB_Class_I_Lot_14_20221212.xlsx"</span>, <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>))</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>pra <span class="ot">&lt;-</span> <span class="fu">process_pra_data</span>(<span class="at">file =</span> <span class="st">"./data/PRA_Class_I_Lot_020_20221212.xlsx"</span>, <span class="dv">1</span>)</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>mix <span class="ot">&lt;-</span> <span class="fu">process_mix_data</span>(<span class="at">file =</span> <span class="st">"./data/LSM12NC23_024_01.xlsx"</span>, <span class="dv">1</span>)</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>explex <span class="ot">&lt;-</span> <span class="fu">process_explex_data</span>(<span class="at">file =</span> <span class="st">"./data/ExPlex_classI_II.xlsx"</span>, <span class="dv">1</span>)</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Add allele columns and calculate sums</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">calculate_sum</span>(df, sab<span class="sc">$</span>Molecular.Typing, <span class="st">"SAB_unique"</span>)</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">calculate_sum</span>(df, pra<span class="sc">$</span>values, <span class="st">"PRA_unique"</span>)</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">calculate_sum</span>(df, mix<span class="sc">$</span>values, <span class="st">"Mix_unique"</span>)</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">calculate_sum</span>(df, explex<span class="sc">$</span>Molecular.Typing, <span class="st">"EXPLEX_unique"</span>)</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate Venn diagrams</span></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a><span class="fu">generate_venn_diagram</span>(df, <span class="st">"outputs/viz/Figure2_classI.png"</span>, <span class="at">pattern =</span> <span class="st">"_unique"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter antibody-verified data and generate another Venn diagram</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>dfa <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="st">`</span><span class="at">Antibody Reactivity</span><span class="st">`</span> <span class="sc">==</span> <span class="st">"Confirmed"</span>)</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="fu">generate_venn_diagram</span>(dfa, <span class="st">"outputs/viz/Figure3_classI.png"</span>, <span class="at">pattern =</span> <span class="st">"_unique"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Save final output</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">write.xlsx</span>(df, <span class="st">"outputs/files/ph_counts_eplets_class1.xlsx"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="./outputs/viz/Figure2_classI.png" class="img-fluid figure-img" width="1500"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="./outputs/viz/Figure3_classI.png" class="img-fluid figure-img" width="1500"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="class-ii-eplets" class="level3">
+<h3 class="anchored" data-anchor-id="class-ii-eplets">Class II Eplets</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">process_hla_registry</span>(<span class="at">file =</span> <span class="st">"./data/HMM-CL02-0620-CAT-00.xlsx"</span>, <span class="dv">1</span>)</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>sab <span class="ot">&lt;-</span> <span class="fu">process_sab_data</span>(<span class="at">file =</span> <span class="st">"./data/SAB_ClassII_Lot_15_20221212.xlsx"</span>, <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>))[<span class="sc">-</span><span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>),]</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>pra <span class="ot">&lt;-</span> <span class="fu">process_pra_data</span>(<span class="at">file =</span> <span class="st">"./data/PRA_Class_II_Lot_019_20221212.xlsx"</span>, <span class="dv">1</span>)</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>mix <span class="ot">&lt;-</span> <span class="fu">process_mix_data</span>(<span class="at">file =</span> <span class="st">"./data/LSM12NC23_024_01.xlsx"</span>, <span class="dv">1</span>)</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>explex <span class="ot">&lt;-</span> <span class="fu">process_explex_data</span>(<span class="at">file =</span> <span class="st">"./data/ExPlex_classI_II.xlsx"</span>, <span class="dv">2</span>)</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Add allele columns and calculate sums</span></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">calculate_sum</span>(df, sab<span class="sc">$</span>Molecular.Typing, <span class="st">"SAB_unique"</span>)</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">calculate_sum</span>(df, pra<span class="sc">$</span>values, <span class="st">"PRA_unique"</span>)</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">calculate_sum</span>(df, mix<span class="sc">$</span>values, <span class="st">"Mix_unique"</span>)</span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">calculate_sum</span>(df, explex<span class="sc">$</span>Molecular.Typing, <span class="st">"EXPLEX_unique"</span>)</span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate Venn diagrams</span></span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a><span class="fu">generate_venn_diagram</span>(df, <span class="st">"outputs/viz/Figure2_classII.png"</span>, <span class="at">pattern =</span> <span class="st">"_unique"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter antibody-verified data and generate another Venn diagram</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>dfa <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="st">`</span><span class="at">Antibody Reactivity</span><span class="st">`</span> <span class="sc">==</span> <span class="st">"Confirmed"</span>)</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="fu">generate_venn_diagram</span>(dfa, <span class="st">"outputs/viz/Figure3_classII.png"</span>, <span class="at">pattern =</span> <span class="st">"_unique"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Save final output</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">write.xlsx</span>(df, <span class="st">"outputs/files/ph_counts_eplets_class2.xlsx"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="./outputs/viz/Figure2_classII.png" class="img-fluid figure-img" width="1500"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="./outputs/viz/Figure3_classII.png" class="img-fluid figure-img" width="1500"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="figure-4-unique-alleles-mapped" class="level2">
+<h2 class="anchored" data-anchor-id="figure-4-unique-alleles-mapped">Figure 4: Unique alleles mapped</h2>
+<section id="class-i" class="level3">
+<h3 class="anchored" data-anchor-id="class-i">Class I</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load and preprocess data</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">process_hla_registry</span>(<span class="at">file =</span> <span class="st">"./data/HMM-CL01-0620-CAT-00.xlsx"</span>, <span class="dv">1</span>)</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>sab <span class="ot">&lt;-</span> <span class="fu">process_sab_data</span>(<span class="at">file =</span> <span class="st">"./data/SAB_Class_I_Lot_14_20221212.xlsx"</span>, <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>))</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>pra <span class="ot">&lt;-</span> <span class="fu">process_pra_data</span>(<span class="at">file =</span> <span class="st">"./data/PRA_Class_I_Lot_020_20221212.xlsx"</span>, <span class="dv">1</span>)</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>mix <span class="ot">&lt;-</span> <span class="fu">process_mix_data</span>(<span class="at">file =</span> <span class="st">"./data/LSM12NC23_024_01.xlsx"</span>, <span class="dv">1</span>)</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>explex <span class="ot">&lt;-</span> <span class="fu">process_explex_data</span>(<span class="at">file =</span> <span class="st">"./data/ExPlex_classI_II.xlsx"</span>, <span class="dv">1</span>)</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a><span class="co">#Remove non-type-I from Mix</span></span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>mix <span class="ot">&lt;-</span> mix[<span class="fu">grepl</span>(<span class="st">"A_|B_|C_"</span>, mix<span class="sc">$</span>values),]</span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a><span class="co">#Making Data Frames</span></span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>sab.frame <span class="ot">&lt;-</span> <span class="fu">calculate_sum</span>(df, sab<span class="sc">$</span>Molecular.Typing, <span class="st">"SAB_sum"</span>, <span class="at">return.sum =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>sab.frame <span class="ot">&lt;-</span> sab.frame<span class="sc">%&gt;%</span> </span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(<span class="st">'Alleles'</span>,<span class="st">'Antibody Reactivity'</span>,<span class="st">'Class'</span>,<span class="st">'Exposed'</span>,<span class="st">'Sero Group'</span>,<span class="st">'AA Position'</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">as.data.frame</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">replace_with_colnames_and_col4</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">select</span>(<span class="sc">-</span><span class="dv">1</span>)  <span class="sc">%&gt;%</span></span>
+<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">unlist</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">unique</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a>                  .[. <span class="sc">!=</span> <span class="dv">0</span>] </span>
+<span id="cb27-21"><a href="#cb27-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-22"><a href="#cb27-22" aria-hidden="true" tabindex="-1"></a>explex.frame <span class="ot">&lt;-</span> <span class="fu">calculate_sum</span>(df, explex<span class="sc">$</span>Molecular.Typing, <span class="st">"EXPLEX_sum"</span>, <span class="at">return.sum =</span> F)</span>
+<span id="cb27-23"><a href="#cb27-23" aria-hidden="true" tabindex="-1"></a>explex.frame <span class="ot">&lt;-</span> explex.frame<span class="sc">%&gt;%</span> </span>
+<span id="cb27-24"><a href="#cb27-24" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(<span class="st">'Alleles'</span>,<span class="st">'Antibody Reactivity'</span>,<span class="st">'Class'</span>,<span class="st">'Exposed'</span>,<span class="st">'Sero Group'</span>,<span class="st">'AA Position'</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb27-25"><a href="#cb27-25" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">as.data.frame</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb27-26"><a href="#cb27-26" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">replace_with_colnames_and_col4</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb27-27"><a href="#cb27-27" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">select</span>(<span class="sc">-</span><span class="dv">1</span>)  <span class="sc">%&gt;%</span></span>
+<span id="cb27-28"><a href="#cb27-28" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">unlist</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb27-29"><a href="#cb27-29" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">unique</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb27-30"><a href="#cb27-30" aria-hidden="true" tabindex="-1"></a>                  .[. <span class="sc">!=</span> <span class="dv">0</span>] </span>
+<span id="cb27-31"><a href="#cb27-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-32"><a href="#cb27-32" aria-hidden="true" tabindex="-1"></a>pra.frame <span class="ot">&lt;-</span> <span class="fu">calculate_sum</span>(df, pra<span class="sc">$</span>values, <span class="st">"PRA_sum"</span>, <span class="at">return.sum =</span> F)</span>
+<span id="cb27-33"><a href="#cb27-33" aria-hidden="true" tabindex="-1"></a>pra.frame <span class="ot">&lt;-</span> pra.frame<span class="sc">%&gt;%</span> </span>
+<span id="cb27-34"><a href="#cb27-34" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(<span class="st">'Alleles'</span>,<span class="st">'Antibody Reactivity'</span>,<span class="st">'Class'</span>,<span class="st">'Exposed'</span>,<span class="st">'Sero Group'</span>,<span class="st">'AA Position'</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb27-35"><a href="#cb27-35" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">as.data.frame</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb27-36"><a href="#cb27-36" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">replace_with_colnames_and_col4</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb27-37"><a href="#cb27-37" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">select</span>(<span class="sc">-</span><span class="dv">1</span>)  <span class="sc">%&gt;%</span></span>
+<span id="cb27-38"><a href="#cb27-38" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">unlist</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb27-39"><a href="#cb27-39" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">unique</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb27-40"><a href="#cb27-40" aria-hidden="true" tabindex="-1"></a>                  .[. <span class="sc">!=</span> <span class="dv">0</span>] </span>
+<span id="cb27-41"><a href="#cb27-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-42"><a href="#cb27-42" aria-hidden="true" tabindex="-1"></a>mix.frame <span class="ot">&lt;-</span> <span class="fu">calculate_sum</span>(df, mix<span class="sc">$</span>values, <span class="st">"MIX_sum"</span>, <span class="at">return.sum =</span> F)</span>
+<span id="cb27-43"><a href="#cb27-43" aria-hidden="true" tabindex="-1"></a>mix.frame <span class="ot">&lt;-</span> mix.frame <span class="sc">%&gt;%</span> </span>
+<span id="cb27-44"><a href="#cb27-44" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(<span class="st">'Alleles'</span>,<span class="st">'Antibody Reactivity'</span>,<span class="st">'Class'</span>,<span class="st">'Exposed'</span>,<span class="st">'Sero Group'</span>,<span class="st">'AA Position'</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb27-45"><a href="#cb27-45" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">as.data.frame</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb27-46"><a href="#cb27-46" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">replace_with_colnames_and_col4</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb27-47"><a href="#cb27-47" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">select</span>(<span class="sc">-</span><span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb27-48"><a href="#cb27-48" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">unlist</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb27-49"><a href="#cb27-49" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">unique</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb27-50"><a href="#cb27-50" aria-hidden="true" tabindex="-1"></a>                  .[. <span class="sc">!=</span> <span class="dv">0</span>] </span>
+<span id="cb27-51"><a href="#cb27-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-52"><a href="#cb27-52" aria-hidden="true" tabindex="-1"></a>b<span class="ot">=</span><span class="fu">list</span>(</span>
+<span id="cb27-53"><a href="#cb27-53" aria-hidden="true" tabindex="-1"></a>  <span class="at">SAB =</span> sab.frame,</span>
+<span id="cb27-54"><a href="#cb27-54" aria-hidden="true" tabindex="-1"></a>  <span class="at">PRA =</span> pra.frame,</span>
+<span id="cb27-55"><a href="#cb27-55" aria-hidden="true" tabindex="-1"></a>  <span class="at">Mixed =</span> mix.frame,</span>
+<span id="cb27-56"><a href="#cb27-56" aria-hidden="true" tabindex="-1"></a>  <span class="at">ExPlex =</span> explex.frame)</span>
+<span id="cb27-57"><a href="#cb27-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-58"><a href="#cb27-58" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a binary membership matrix</span></span>
+<span id="cb27-59"><a href="#cb27-59" aria-hidden="true" tabindex="-1"></a>all_elements <span class="ot">&lt;-</span> <span class="fu">unique</span>(<span class="fu">unlist</span>(b))</span>
+<span id="cb27-60"><a href="#cb27-60" aria-hidden="true" tabindex="-1"></a>membership_matrix <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb27-61"><a href="#cb27-61" aria-hidden="true" tabindex="-1"></a>  <span class="at">element =</span> all_elements,</span>
+<span id="cb27-62"><a href="#cb27-62" aria-hidden="true" tabindex="-1"></a>  <span class="at">SAB =</span> all_elements <span class="sc">%in%</span> b<span class="sc">$</span>SAB,</span>
+<span id="cb27-63"><a href="#cb27-63" aria-hidden="true" tabindex="-1"></a>  <span class="at">PRA =</span> all_elements <span class="sc">%in%</span> b<span class="sc">$</span>PRA,</span>
+<span id="cb27-64"><a href="#cb27-64" aria-hidden="true" tabindex="-1"></a>  <span class="at">Mixed =</span> all_elements <span class="sc">%in%</span> b<span class="sc">$</span>Mix,</span>
+<span id="cb27-65"><a href="#cb27-65" aria-hidden="true" tabindex="-1"></a>  <span class="at">ExPlex =</span> all_elements <span class="sc">%in%</span> b<span class="sc">$</span>ExPlex</span>
+<span id="cb27-66"><a href="#cb27-66" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb27-67"><a href="#cb27-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-68"><a href="#cb27-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-69"><a href="#cb27-69" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert logical values to binary</span></span>
+<span id="cb27-70"><a href="#cb27-70" aria-hidden="true" tabindex="-1"></a>membership_matrix <span class="ot">&lt;-</span> membership_matrix <span class="sc">%&gt;%</span></span>
+<span id="cb27-71"><a href="#cb27-71" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(element, ExPlex, Mixed, PRA, SAB)</span>
+<span id="cb27-72"><a href="#cb27-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-73"><a href="#cb27-73" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate the UpSet plot</span></span>
+<span id="cb27-74"><a href="#cb27-74" aria-hidden="true" tabindex="-1"></a>upset_data <span class="ot">&lt;-</span> membership_matrix <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span>element)</span>
+<span id="cb27-75"><a href="#cb27-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-76"><a href="#cb27-76" aria-hidden="true" tabindex="-1"></a>upset_data <span class="ot">&lt;-</span> upset_data[, <span class="fu">c</span>(<span class="st">"ExPlex"</span>, <span class="st">"Mixed"</span>, <span class="st">"PRA"</span>, <span class="st">"SAB"</span>)]</span>
+<span id="cb27-77"><a href="#cb27-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-78"><a href="#cb27-78" aria-hidden="true" tabindex="-1"></a><span class="co"># Then specify the same order in the `intersect` argument:</span></span>
+<span id="cb27-79"><a href="#cb27-79" aria-hidden="true" tabindex="-1"></a><span class="fu">upset</span>(</span>
+<span id="cb27-80"><a href="#cb27-80" aria-hidden="true" tabindex="-1"></a>  upset_data,</span>
+<span id="cb27-81"><a href="#cb27-81" aria-hidden="true" tabindex="-1"></a>  <span class="at">intersect =</span> <span class="fu">colnames</span>(upset_data), <span class="co"># Now in alphabetical order</span></span>
+<span id="cb27-82"><a href="#cb27-82" aria-hidden="true" tabindex="-1"></a>  <span class="at">base_annotations =</span> <span class="fu">list</span>(<span class="st">'Number of Combined</span><span class="sc">\n</span><span class="st">Eplet-Antigens'</span> <span class="ot">=</span> <span class="fu">intersection_size</span>()),</span>
+<span id="cb27-83"><a href="#cb27-83" aria-hidden="true" tabindex="-1"></a>  <span class="at">sort_intersections_by=</span><span class="st">'degree'</span>,</span>
+<span id="cb27-84"><a href="#cb27-84" aria-hidden="true" tabindex="-1"></a>  <span class="at">themes =</span> <span class="fu">upset_default_themes</span>(<span class="at">text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>)), </span>
+<span id="cb27-85"><a href="#cb27-85" aria-hidden="true" tabindex="-1"></a>  <span class="at">set_sizes =</span> <span class="cn">FALSE</span>, </span>
+<span id="cb27-86"><a href="#cb27-86" aria-hidden="true" tabindex="-1"></a>  <span class="at">sort_sets =</span> <span class="cn">FALSE</span> </span>
+<span id="cb27-87"><a href="#cb27-87" aria-hidden="true" tabindex="-1"></a>) <span class="sc">+</span> </span>
+<span id="cb27-88"><a href="#cb27-88" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.title.x =</span> <span class="fu">element_blank</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="EpletWorkflow_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">'outputs/viz/Figure4_classI.png'</span>, <span class="at">width =</span> <span class="dv">8</span>, <span class="at">height =</span> <span class="dv">6</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="class-ii" class="level3">
+<h3 class="anchored" data-anchor-id="class-ii">Class II</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">process_hla_registry</span>(<span class="at">file =</span> <span class="st">"./data/HMM-CL02-0620-CAT-00.xlsx"</span>, <span class="dv">1</span>)</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>sab <span class="ot">&lt;-</span> <span class="fu">process_sab_data</span>(<span class="at">file =</span> <span class="st">"./data/SAB_ClassII_Lot_15_20221212.xlsx"</span>, <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>))[<span class="sc">-</span><span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>),]</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>pra <span class="ot">&lt;-</span> <span class="fu">process_pra_data</span>(<span class="at">file =</span> <span class="st">"./data/PRA_Class_II_Lot_019_20221212.xlsx"</span>, <span class="dv">1</span>)</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>mix <span class="ot">&lt;-</span> <span class="fu">process_mix_data</span>(<span class="at">file =</span> <span class="st">"./data/LSM12NC23_024_01.xlsx"</span>, <span class="dv">1</span>)</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>explex <span class="ot">&lt;-</span> <span class="fu">process_explex_data</span>(<span class="at">file =</span> <span class="st">"./data/ExPlex_classI_II.xlsx"</span>, <span class="dv">2</span>)</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a><span class="co">#Remove non-type-I from Mix</span></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>mix <span class="ot">&lt;-</span> mix[<span class="sc">-</span><span class="fu">grepl</span>(<span class="st">"A_|B_|C_"</span>, mix<span class="sc">$</span>values),]</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a><span class="co">#Making Data Frames</span></span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>sab.frame <span class="ot">&lt;-</span> <span class="fu">calculate_sum</span>(df, sab<span class="sc">$</span>Molecular.Typing, <span class="st">"SAB_sum"</span>, <span class="at">return.sum =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>sab.frame <span class="ot">&lt;-</span> sab.frame<span class="sc">%&gt;%</span> </span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(<span class="st">'Alleles'</span>,<span class="st">'Antibody Reactivity'</span>,<span class="st">'Class'</span>,<span class="st">'Exposed'</span>,<span class="st">'Sero Group'</span>,<span class="st">'AA Position'</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">as.data.frame</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">replace_with_colnames_and_col4</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">select</span>(<span class="sc">-</span><span class="dv">1</span>)  <span class="sc">%&gt;%</span></span>
+<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">unlist</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">unique</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb29-20"><a href="#cb29-20" aria-hidden="true" tabindex="-1"></a>                  .[. <span class="sc">!=</span> <span class="dv">0</span>] </span>
+<span id="cb29-21"><a href="#cb29-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-22"><a href="#cb29-22" aria-hidden="true" tabindex="-1"></a>explex.frame <span class="ot">&lt;-</span> <span class="fu">calculate_sum</span>(df, explex<span class="sc">$</span>Molecular.Typing, <span class="st">"EXPLEX_sum"</span>, <span class="at">return.sum =</span> F)</span>
+<span id="cb29-23"><a href="#cb29-23" aria-hidden="true" tabindex="-1"></a>explex.frame <span class="ot">&lt;-</span> explex.frame<span class="sc">%&gt;%</span> </span>
+<span id="cb29-24"><a href="#cb29-24" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(<span class="st">'Alleles'</span>,<span class="st">'Antibody Reactivity'</span>,<span class="st">'Class'</span>,<span class="st">'Exposed'</span>,<span class="st">'Sero Group'</span>,<span class="st">'AA Position'</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb29-25"><a href="#cb29-25" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">as.data.frame</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb29-26"><a href="#cb29-26" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">replace_with_colnames_and_col4</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb29-27"><a href="#cb29-27" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">select</span>(<span class="sc">-</span><span class="dv">1</span>)  <span class="sc">%&gt;%</span></span>
+<span id="cb29-28"><a href="#cb29-28" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">unlist</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb29-29"><a href="#cb29-29" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">unique</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb29-30"><a href="#cb29-30" aria-hidden="true" tabindex="-1"></a>                  .[. <span class="sc">!=</span> <span class="dv">0</span>] </span>
+<span id="cb29-31"><a href="#cb29-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-32"><a href="#cb29-32" aria-hidden="true" tabindex="-1"></a>pra.frame <span class="ot">&lt;-</span> <span class="fu">calculate_sum</span>(df, pra<span class="sc">$</span>values, <span class="st">"PRA_sum"</span>, <span class="at">return.sum =</span> F)</span>
+<span id="cb29-33"><a href="#cb29-33" aria-hidden="true" tabindex="-1"></a>pra.frame <span class="ot">&lt;-</span> pra.frame<span class="sc">%&gt;%</span> </span>
+<span id="cb29-34"><a href="#cb29-34" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(<span class="st">'Alleles'</span>,<span class="st">'Antibody Reactivity'</span>,<span class="st">'Class'</span>,<span class="st">'Exposed'</span>,<span class="st">'Sero Group'</span>,<span class="st">'AA Position'</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb29-35"><a href="#cb29-35" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">as.data.frame</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb29-36"><a href="#cb29-36" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">replace_with_colnames_and_col4</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb29-37"><a href="#cb29-37" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">select</span>(<span class="sc">-</span><span class="dv">1</span>)  <span class="sc">%&gt;%</span></span>
+<span id="cb29-38"><a href="#cb29-38" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">unlist</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb29-39"><a href="#cb29-39" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">unique</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb29-40"><a href="#cb29-40" aria-hidden="true" tabindex="-1"></a>                  .[. <span class="sc">!=</span> <span class="dv">0</span>] </span>
+<span id="cb29-41"><a href="#cb29-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-42"><a href="#cb29-42" aria-hidden="true" tabindex="-1"></a>mix.frame <span class="ot">&lt;-</span> <span class="fu">calculate_sum</span>(df, mix<span class="sc">$</span>values, <span class="st">"MIX_sum"</span>, <span class="at">return.sum =</span> F)</span>
+<span id="cb29-43"><a href="#cb29-43" aria-hidden="true" tabindex="-1"></a>mix.frame <span class="ot">&lt;-</span> mix.frame <span class="sc">%&gt;%</span> </span>
+<span id="cb29-44"><a href="#cb29-44" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(<span class="st">'Alleles'</span>,<span class="st">'Antibody Reactivity'</span>,<span class="st">'Class'</span>,<span class="st">'Exposed'</span>,<span class="st">'Sero Group'</span>,<span class="st">'AA Position'</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb29-45"><a href="#cb29-45" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">as.data.frame</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb29-46"><a href="#cb29-46" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">replace_with_colnames_and_col4</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb29-47"><a href="#cb29-47" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">select</span>(<span class="sc">-</span><span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb29-48"><a href="#cb29-48" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">unlist</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb29-49"><a href="#cb29-49" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">unique</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb29-50"><a href="#cb29-50" aria-hidden="true" tabindex="-1"></a>                  .[. <span class="sc">!=</span> <span class="dv">0</span>] </span>
+<span id="cb29-51"><a href="#cb29-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-52"><a href="#cb29-52" aria-hidden="true" tabindex="-1"></a>b<span class="ot">=</span><span class="fu">list</span>(</span>
+<span id="cb29-53"><a href="#cb29-53" aria-hidden="true" tabindex="-1"></a>  <span class="at">SAB =</span> sab.frame,</span>
+<span id="cb29-54"><a href="#cb29-54" aria-hidden="true" tabindex="-1"></a>  <span class="at">PRA =</span> pra.frame,</span>
+<span id="cb29-55"><a href="#cb29-55" aria-hidden="true" tabindex="-1"></a>  <span class="at">Mixed =</span> mix.frame,</span>
+<span id="cb29-56"><a href="#cb29-56" aria-hidden="true" tabindex="-1"></a>  <span class="at">ExPlex =</span> explex.frame)</span>
+<span id="cb29-57"><a href="#cb29-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-58"><a href="#cb29-58" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a binary membership matrix</span></span>
+<span id="cb29-59"><a href="#cb29-59" aria-hidden="true" tabindex="-1"></a>all_elements <span class="ot">&lt;-</span> <span class="fu">unique</span>(<span class="fu">unlist</span>(b))</span>
+<span id="cb29-60"><a href="#cb29-60" aria-hidden="true" tabindex="-1"></a>membership_matrix <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb29-61"><a href="#cb29-61" aria-hidden="true" tabindex="-1"></a>  <span class="at">element =</span> all_elements,</span>
+<span id="cb29-62"><a href="#cb29-62" aria-hidden="true" tabindex="-1"></a>  <span class="at">SAB =</span> all_elements <span class="sc">%in%</span> b<span class="sc">$</span>SAB,</span>
+<span id="cb29-63"><a href="#cb29-63" aria-hidden="true" tabindex="-1"></a>  <span class="at">PRA =</span> all_elements <span class="sc">%in%</span> b<span class="sc">$</span>PRA,</span>
+<span id="cb29-64"><a href="#cb29-64" aria-hidden="true" tabindex="-1"></a>  <span class="at">Mixed =</span> all_elements <span class="sc">%in%</span> b<span class="sc">$</span>Mix,</span>
+<span id="cb29-65"><a href="#cb29-65" aria-hidden="true" tabindex="-1"></a>  <span class="at">ExPlex =</span> all_elements <span class="sc">%in%</span> b<span class="sc">$</span>ExPlex</span>
+<span id="cb29-66"><a href="#cb29-66" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb29-67"><a href="#cb29-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-68"><a href="#cb29-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-69"><a href="#cb29-69" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert logical values to binary</span></span>
+<span id="cb29-70"><a href="#cb29-70" aria-hidden="true" tabindex="-1"></a>membership_matrix <span class="ot">&lt;-</span> membership_matrix <span class="sc">%&gt;%</span></span>
+<span id="cb29-71"><a href="#cb29-71" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(element, ExPlex, Mixed, PRA, SAB)</span>
+<span id="cb29-72"><a href="#cb29-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-73"><a href="#cb29-73" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate the UpSet plot</span></span>
+<span id="cb29-74"><a href="#cb29-74" aria-hidden="true" tabindex="-1"></a>upset_data <span class="ot">&lt;-</span> membership_matrix <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span>element)</span>
+<span id="cb29-75"><a href="#cb29-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-76"><a href="#cb29-76" aria-hidden="true" tabindex="-1"></a>upset_data <span class="ot">&lt;-</span> upset_data[, <span class="fu">c</span>(<span class="st">"ExPlex"</span>, <span class="st">"Mixed"</span>, <span class="st">"PRA"</span>, <span class="st">"SAB"</span>)]</span>
+<span id="cb29-77"><a href="#cb29-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-78"><a href="#cb29-78" aria-hidden="true" tabindex="-1"></a><span class="co"># Then specify the same order in the `intersect` argument:</span></span>
+<span id="cb29-79"><a href="#cb29-79" aria-hidden="true" tabindex="-1"></a><span class="fu">upset</span>(</span>
+<span id="cb29-80"><a href="#cb29-80" aria-hidden="true" tabindex="-1"></a>  upset_data,</span>
+<span id="cb29-81"><a href="#cb29-81" aria-hidden="true" tabindex="-1"></a>  <span class="at">intersect =</span> <span class="fu">colnames</span>(upset_data), <span class="co"># Now in alphabetical order</span></span>
+<span id="cb29-82"><a href="#cb29-82" aria-hidden="true" tabindex="-1"></a>  <span class="at">base_annotations =</span> <span class="fu">list</span>(<span class="st">'Number of Combined</span><span class="sc">\n</span><span class="st">Eplet-Antigens'</span> <span class="ot">=</span> <span class="fu">intersection_size</span>()),</span>
+<span id="cb29-83"><a href="#cb29-83" aria-hidden="true" tabindex="-1"></a>  <span class="at">sort_intersections_by=</span><span class="st">'degree'</span>,</span>
+<span id="cb29-84"><a href="#cb29-84" aria-hidden="true" tabindex="-1"></a>  <span class="at">themes =</span> <span class="fu">upset_default_themes</span>(<span class="at">text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>)), </span>
+<span id="cb29-85"><a href="#cb29-85" aria-hidden="true" tabindex="-1"></a>  <span class="at">set_sizes =</span> <span class="cn">FALSE</span>, </span>
+<span id="cb29-86"><a href="#cb29-86" aria-hidden="true" tabindex="-1"></a>  <span class="at">sort_sets =</span> <span class="cn">FALSE</span> </span>
+<span id="cb29-87"><a href="#cb29-87" aria-hidden="true" tabindex="-1"></a>) <span class="sc">+</span> </span>
+<span id="cb29-88"><a href="#cb29-88" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.title.x =</span> <span class="fu">element_blank</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="EpletWorkflow_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">'outputs/viz/Figure4_classII.png'</span>, <span class="at">width =</span> <span class="dv">8</span>, <span class="at">height =</span> <span class="dv">6</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="conclusion" class="level2">
+<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
+<p>Here is the comprehensive summary and code of the analysis performed. The following package versions may be helpful in recreating the analysis or making your own.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>R version 4.4.2 (2024-10-31)
+Platform: aarch64-apple-darwin20
+Running under: macOS Sonoma 14.0
+
+Matrix products: default
+BLAS:   /Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/lib/libRblas.0.dylib 
+LAPACK: /Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.0
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+time zone: America/Chicago
+tzcode source: internal
+
+attached base packages:
+[1] grid      stats     graphics  grDevices utils     datasets  methods  
+[8] base     
+
+other attached packages:
+ [1] ComplexUpset_1.3.3  VennDiagram_1.7.3   futile.logger_1.4.3
+ [4] proustr_0.4.0       hrbrthemes_0.8.7    forcats_1.0.0      
+ [7] purrr_1.0.2         readr_2.1.5         tibble_3.2.1       
+[10] ggplot2_3.5.1       tidyverse_2.0.0     openxlsx_4.2.7.1   
+[13] readxl_1.4.3        lubridate_1.9.4     venn_1.12          
+[16] stringr_1.5.1       janitor_2.2.0       tidyr_1.3.1        
+[19] data.table_1.16.4   dplyr_1.1.4        
+
+loaded via a namespace (and not attached):
+ [1] gtable_0.3.6            xfun_0.49               htmlwidgets_1.6.4      
+ [4] tzdb_0.4.0              vctrs_0.6.5             tools_4.4.2            
+ [7] generics_0.1.3          pkgconfig_2.0.3         tokenizers_0.3.0       
+[10] lifecycle_1.0.4         farver_2.1.2            compiler_4.4.2         
+[13] textshaping_0.4.1       munsell_0.5.1           snakecase_0.11.1       
+[16] fontquiver_0.2.1        fontLiberation_0.1.0    htmltools_0.5.8.1      
+[19] SnowballC_0.7.1         yaml_2.3.10             Rttf2pt1_1.3.12        
+[22] pillar_1.10.0           extrafontdb_1.0         admisc_0.37            
+[25] fontBitstreamVera_0.1.1 tidyselect_1.2.1        zip_2.3.1              
+[28] digest_0.6.37           stringi_1.8.4           labeling_0.4.3         
+[31] extrafont_0.19          fastmap_1.2.0           colorspace_2.1-1       
+[34] cli_3.6.3               magrittr_2.0.3          patchwork_1.3.0        
+[37] utf8_1.2.4              withr_3.0.2             gdtools_0.4.1          
+[40] scales_1.3.0            timechange_0.3.0        lambda.r_1.2.4         
+[43] rmarkdown_2.29          cellranger_1.1.0        png_0.1-8              
+[46] ragg_1.3.3              hms_1.1.3               evaluate_1.0.1         
+[49] knitr_1.49              rlang_1.1.4             futile.options_1.0.1   
+[52] Rcpp_1.0.13-1           glue_1.8.0              formatR_1.14           
+[55] attempt_0.3.1           rstudioapi_0.17.1       jsonlite_1.8.9         
+[58] R6_2.5.1                systemfonts_1.1.0      </code></pre>
+</div>
+</div>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

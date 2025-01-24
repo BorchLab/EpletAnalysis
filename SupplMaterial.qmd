@@ -1,0 +1,226 @@
+---
+title: "Supplemental Material"
+author: 
+- name: Patricia Hernandex
+  email: hernandez.p@wustl.edu
+  affiliation: Washington University in St. Louis, School of Medicine, St. Louis, MO, USA
+- name: Nick Borcherding
+  email: borcherding.n@wustl.edu
+  affiliation: Washington University in St. Louis, School of Medicine, St. Louis, MO, USA
+output: word
+---
+
+# Supplemental material
+
+## Loading Library
+
+This will load the libraries necessary to run the analysis. If the libraries/packages are not installed, this code will install them before loading them.
+
+```{r message = FALSE, warning = FALSE}
+required_libraries <- c(
+  "dplyr", "data.table", "tidyr", "janitor", "stringr", "venn",
+  "lubridate", "readxl", "openxlsx", "tidyverse", "hrbrthemes",
+  "proustr", "VennDiagram", "ComplexUpset"
+)
+
+# Function to check, install if needed, and load libraries
+load_libraries <- function(libraries) {
+  for (lib in libraries) {
+    if (!requireNamespace(lib, quietly = TRUE)) {
+      install.packages(lib, dependencies = TRUE)
+    }
+    library(lib, character.only = TRUE)
+  }
+}
+
+# Execute the function
+load_libraries(required_libraries)
+```
+
+## Loading Functions
+
+These are custom functions written for the analysis to assist in loading and plotting the data. More information can be found in the github repository under the R folder.
+
+```{r message = FALSE, warning = FALSE}
+source("./R/load_data.R")
+source("./R/utils.R")
+source("./R/calculate_sum.R")
+source("./R/generate_venn_diagram.R")
+source("./R/generate_upset_plot.R")
+
+```
+
+## Extra functions
+
+Functions to be used for supplemental tables
+
+```{r}
+# Asterix
+asterix<- function(list){lapply(list, function(x) {gsub("_", "*", x)})} #Replace _ with *
+
+# Transform list into dataframe
+list_to_df <- function(list){data.frame(lapply(list, function(x) {
+  x <- unlist(x)
+  length(x) <- max(lengths(list))
+  return(x)
+}))}
+
+
+table_maker <- function(df, filename = "output.docx", add_new_page = FALSE) {
+  # Define the directory "./outputs/tables"
+  directory <- "./outputs/tables"
+  
+  # Create the directory if it doesn't exist
+  if (!dir.exists(directory)) {
+    dir.create(directory, recursive = TRUE)
+    cat("Directory created at:", directory, "\n")
+  }
+  
+  # Ensure the filename ends with ".docx"
+  if (!grepl("\\.docx$", filename)) {
+    stop("Filename must end with '.docx'")
+  }
+  
+  # Define the full output path
+  output_path <- file.path(directory, filename)
+  
+  # Check if the document exists
+  if (file.exists(output_path)) {
+    # Load the existing document
+    doc <- read_docx(path = output_path)
+  } else {
+    # Create a new document
+    doc <- read_docx()
+  }
+  
+  # Create a flextable from the dataframe
+  ft <- flextable(df) %>%
+    theme_box() %>%
+    autofit()
+  
+  # Add a new page if required
+  if (add_new_page) {
+    doc <- doc %>% body_add_break()
+  }
+  
+  # Add the flextable to the document
+  doc <- doc %>% body_add_flextable(ft)
+  
+  # Save the document
+  print(doc, target = output_path)
+  
+  # Return the path of the saved file
+  cat("Table added to Word document at:", output_path, "\n")
+  return(output_path)
+}
+
+```
+
+### Figure 1 - Class I
+
+```{r message=FALSE, warning=FALSE}
+sab <- process_sab_data(file = "./data/SAB_Class_I_Lot_14_20221212.xlsx", c(1,2)) 
+pra <- process_pra_data(file = "./data/PRA_Class_I_Lot_020_20221212.xlsx", 1) 
+mix <- process_mix_data(file = "./data/LSM12NC23_024_01.xlsx", 1) 
+explex <- process_explex_data(file = "./data/ExPlex_classI_II.xlsx", 1)
+
+#Remove non-type-I from Mix
+mix <- mix[grepl("A_|B_|C_", mix$values),]
+
+b <- list(
+  SAB = unique(sab$Molecular.Typing),
+  PRA = unique(pra$values),
+  Mix = unique(mix$values),
+  ExPlex = unique(explex$Molecular.Typing)
+)
+
+b <- asterix(b)
+
+```
+
+```{r}
+unlistb <- list_to_df(b)
+#table_maker(unlistb,filename = "STable1_ClassI.docx")
+```
+
+#### Only intersections
+
+```{r}
+#PRA, SAB, Mix
+intersection <- Reduce(intersect, unlistb[, c("SAB", "PRA", "Mix")])
+print(intersection)
+```
+
+```{r}
+# ExPlex
+noexplex <- c(unlistb$SAB,unlistb$PRA,unlistb$Mix)
+ex <-unlistb$ExPlex[!unlistb$ExPlex %in% noexplex]
+```
+
+### Figure 1 - Class II
+
+```{r message = FALSE, warning = FALSE}
+sab <- process_sab_data(file = "./data/SAB_ClassII_Lot_15_20221212.xlsx", c(1:2))[-c(1:2),]
+pra <- process_pra_data(file = "./data/PRA_Class_II_Lot_019_20221212.xlsx", 1)
+mix <- process_mix_data(file = "./data/LSM12NC23_024_01.xlsx", 1) 
+explex <- process_explex_data(file = "./data/ExPlex_classI_II.xlsx", 2)
+
+#Remove type-I from Mix
+mix <- mix[!grepl("A_|B_|C_", mix$values),]
+
+b <- list(
+  SAB = unique(sab$Molecular.Typing),
+  PRA = unique(pra$values),
+  Mix = unique(mix$values),
+  ExPlex = unique(explex$Molecular.Typing)
+)
+b <- asterix(b)
+```
+
+```{r}
+unlistb <- list_to_df(b)
+#table_maker(unlistb,filename = "STable1_ClassI.docx")
+```
+
+#### Only intersections
+
+```{r}
+#PRA, SAB, Mix
+intersection <- Reduce(intersect, unlistb[, c("SAB", "PRA", "Mix")])
+print(intersection)
+```
+
+```{r}
+# ExPlex
+noexplex <- c(unlistb$SAB,unlistb$PRA,unlistb$Mix)
+ex <-unlistb$ExPlex[!unlistb$ExPlex %in% noexplex]
+print(ex)
+```
+
+#### SAB and ExPlex mutual eplets (class II)
+
+```{r}
+#SAB and ExPlex
+intersection2 <- Reduce(intersect, unlistb[, c("SAB","ExPlex")])
+print(intersection2)
+```
+
+## Figure 2, Class II
+
+```{r}
+df <- process_hla_registry(file = "./data/HMM-CL02-0620-CAT-00.xlsx", 1)
+sab <- process_sab_data(file = "./data/SAB_ClassII_Lot_15_20221212.xlsx", c(1:2))[-c(1:2),]
+pra <- process_pra_data(file = "./data/PRA_Class_II_Lot_019_20221212.xlsx", 1)
+mix <- process_mix_data(file = "./data/LSM12NC23_024_01.xlsx", 1)
+explex <- process_explex_data(file = "./data/ExPlex_classI_II.xlsx", 2)
+
+#SAB and ExPlex
+intersection2 <- intersect(sab$Molecular.Typing,explex$Molecular.Typing)
+print(intersection2)
+
+```
+
+```{r}
+# Intersection SAB and ExPlex - eplets 
+filtered_df <- df[grep(intersection2, df$Alleles), ]
+```
