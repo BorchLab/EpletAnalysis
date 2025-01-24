@@ -54,28 +54,28 @@ The most important step before running the analysis is to ensure that the data i
 
 ### SAB Assay
 
-```{r}
+```{r message = FALSE, warning = FALSE}
 SAB <- read_xlsx("data/SAB_Class_I_Lot_14_20221212.xlsx", sheet = 1)
 head(SAB)
 ```
 
 ### PRA Assay
 
-```{r}
+```{r message = FALSE, warning = FALSE}
 PRA <- read_xlsx("data/PRA_Class_I_Lot_020_20221212.xlsx", sheet = 1)
 head(PRA)
 ```
 
 ### Mix Assay
 
-```{r}
+```{r message = FALSE, warning = FALSE}
 Mix <- read_xlsx("data/LSM12NC23_024_01.xlsx", sheet = 1)
 head(Mix)
 ```
 
 ### ExPlex Assay
 
-```{r}
+```{r message = FALSE, warning = FALSE}
 ExPlex <- read_xlsx("data/ExPlex_classI_II.xlsx", sheet = 1)
 head(ExPlex)
 ```
@@ -209,17 +209,19 @@ df <- calculate_sum(df, mix$values, "Mix_unique")
 df <- calculate_sum(df, explex$Molecular.Typing, "EXPLEX_unique")
 
 # Generate Venn diagrams
-generate_venn_diagram(df, "outputs/viz/Figure2_classI.png", pattern = "_unique")
+generate_venn_diagram(df, "outputs/viz/Figure2_classI.png", 
+                      pattern = "_unique")
 
 # Filter antibody-verified data and generate another Venn diagram
 dfa <- df %>% filter(`Antibody Reactivity` == "Confirmed")
-generate_venn_diagram(dfa, "outputs/viz/Figure3_classI.png", pattern = "_unique")
+generate_venn_diagram(dfa, "outputs/viz/Figure3_classI.png", 
+                      pattern = "_unique")
 
 # Save final output
 write.xlsx(df, "outputs/files/ph_counts_eplets_class1.xlsx")
 ```
 
-```{r echo=FALSE}
+```{r echo=FALSE, fig.height = 4, fig.width = 7}
 knitr::include_graphics("./outputs/viz/Figure2_classI.png")
 knitr::include_graphics("./outputs/viz/Figure3_classI.png")
 ```
@@ -250,7 +252,7 @@ generate_venn_diagram(dfa, "outputs/viz/Figure3_classII.png", pattern = "_unique
 write.xlsx(df, "outputs/files/ph_counts_eplets_class2.xlsx")
 ```
 
-```{r echo=FALSE}
+```{r echo=FALSE, fig.height = 4, fig.width = 7}
 knitr::include_graphics("./outputs/viz/Figure2_classII.png")
 knitr::include_graphics("./outputs/viz/Figure3_classII.png")
 ```
@@ -262,7 +264,8 @@ knitr::include_graphics("./outputs/viz/Figure3_classII.png")
 ```{r message = FALSE, warning = FALSE}
 # Load and preprocess data
 df <- process_hla_registry(file = "./data/HMM-CL01-0620-CAT-00.xlsx", 1)
-sab <- process_sab_data(file = "./data/SAB_Class_I_Lot_14_20221212.xlsx", c(1,2))
+sab <- process_sab_data(file = "./data/SAB_Class_I_Lot_14_20221212.xlsx", 
+                        c(1,2))
 pra <- process_pra_data(file = "./data/PRA_Class_I_Lot_020_20221212.xlsx", 1)
 mix <- process_mix_data(file = "./data/LSM12NC23_024_01.xlsx", 1)
 explex <- process_explex_data(file = "./data/ExPlex_classI_II.xlsx", 1)
@@ -271,9 +274,12 @@ explex <- process_explex_data(file = "./data/ExPlex_classI_II.xlsx", 1)
 mix <- mix[grepl("A_|B_|C_", mix$values),]
 
 #Making Data Frames
-sab.frame <- calculate_sum(df, sab$Molecular.Typing, "SAB_sum", return.sum = FALSE)
+sab.frame <- calculate_sum(df, sab$Molecular.Typing, "SAB_sum", 
+                           return.sum = FALSE)
 sab.frame <- sab.frame%>% 
-                  select(-c('Alleles','Antibody Reactivity','Class','Exposed','Sero Group','AA Position')) %>%
+                  select(-c('Alleles','Antibody Reactivity',
+                            'Class','Exposed','Sero Group',
+                            'AA Position')) %>%
                   as.data.frame() %>%
                   replace_with_colnames_and_col4() %>%
                   select(-1)  %>%
@@ -281,9 +287,12 @@ sab.frame <- sab.frame%>%
                   unique() %>%
                   .[. != 0] 
 
-explex.frame <- calculate_sum(df, explex$Molecular.Typing, "EXPLEX_sum", return.sum = F)
+explex.frame <- calculate_sum(df, explex$Molecular.Typing, "EXPLEX_sum", 
+                              return.sum = F)
 explex.frame <- explex.frame%>% 
-                  select(-c('Alleles','Antibody Reactivity','Class','Exposed','Sero Group','AA Position')) %>%
+                  select(-c('Alleles','Antibody Reactivity',
+                            'Class','Exposed','Sero Group',
+                            'AA Position')) %>%
                   as.data.frame() %>%
                   replace_with_colnames_and_col4() %>%
                   select(-1)  %>%
@@ -291,9 +300,12 @@ explex.frame <- explex.frame%>%
                   unique() %>%
                   .[. != 0] 
 
-pra.frame <- calculate_sum(df, pra$values, "PRA_sum", return.sum = F)
+pra.frame <- calculate_sum(df, pra$values, "PRA_sum", 
+                           return.sum = F)
 pra.frame <- pra.frame%>% 
-                  select(-c('Alleles','Antibody Reactivity','Class','Exposed','Sero Group','AA Position')) %>%
+                  select(-c('Alleles','Antibody Reactivity',
+                            'Class','Exposed','Sero Group',
+                            'AA Position')) %>%
                   as.data.frame() %>%
                   replace_with_colnames_and_col4() %>%
                   select(-1)  %>%
@@ -301,9 +313,12 @@ pra.frame <- pra.frame%>%
                   unique() %>%
                   .[. != 0] 
 
-mix.frame <- calculate_sum(df, mix$values, "MIX_sum", return.sum = F)
+mix.frame <- calculate_sum(df, mix$values, "MIX_sum", 
+                           return.sum = F)
 mix.frame <- mix.frame %>% 
-                  select(-c('Alleles','Antibody Reactivity','Class','Exposed','Sero Group','AA Position')) %>%
+                  select(-c('Alleles','Antibody Reactivity',
+                            'Class','Exposed','Sero Group',
+                            'AA Position')) %>%
                   as.data.frame() %>%
                   replace_with_colnames_and_col4() %>%
                   select(-1) %>%
@@ -341,7 +356,8 @@ upset_data <- upset_data[, c("ExPlex", "Mixed", "PRA", "SAB")]
 upset(
   upset_data,
   intersect = colnames(upset_data), # Now in alphabetical order
-  base_annotations = list('Number of Combined\nEplet-Antigens' = intersection_size()),
+  base_annotations = 
+    list('Number of Combined\nEplet-Antigens' = intersection_size()),
   sort_intersections_by='degree',
   themes = upset_default_themes(text = element_text(size = 12)), 
   set_sizes = FALSE, 
@@ -357,7 +373,8 @@ ggsave('outputs/viz/Figure4_classI.png', width = 8, height = 6)
 
 ```{r message = FALSE, warning = FALSE}
 df <- process_hla_registry(file = "./data/HMM-CL02-0620-CAT-00.xlsx", 1)
-sab <- process_sab_data(file = "./data/SAB_ClassII_Lot_15_20221212.xlsx", c(1:2))[-c(1:2),]
+sab <- process_sab_data(file = "./data/SAB_ClassII_Lot_15_20221212.xlsx", 
+                        c(1:2))[-c(1:2),]
 pra <- process_pra_data(file = "./data/PRA_Class_II_Lot_019_20221212.xlsx", 1)
 mix <- process_mix_data(file = "./data/LSM12NC23_024_01.xlsx", 1)
 explex <- process_explex_data(file = "./data/ExPlex_classI_II.xlsx", 2)
@@ -367,9 +384,12 @@ mix <- mix[-grepl("A_|B_|C_", mix$values),]
 
 
 #Making Data Frames
-sab.frame <- calculate_sum(df, sab$Molecular.Typing, "SAB_sum", return.sum = FALSE)
+sab.frame <- calculate_sum(df, sab$Molecular.Typing, "SAB_sum", 
+                           return.sum = FALSE)
 sab.frame <- sab.frame%>% 
-                  select(-c('Alleles','Antibody Reactivity','Class','Exposed','Sero Group','AA Position')) %>%
+                  select(-c('Alleles','Antibody Reactivity'
+                            ,'Class','Exposed','Sero Group',
+                            'AA Position')) %>%
                   as.data.frame() %>%
                   replace_with_colnames_and_col4() %>%
                   select(-1)  %>%
@@ -377,9 +397,12 @@ sab.frame <- sab.frame%>%
                   unique() %>%
                   .[. != 0] 
 
-explex.frame <- calculate_sum(df, explex$Molecular.Typing, "EXPLEX_sum", return.sum = F)
+explex.frame <- calculate_sum(df, explex$Molecular.Typing, "EXPLEX_sum", 
+                              return.sum = F)
 explex.frame <- explex.frame%>% 
-                  select(-c('Alleles','Antibody Reactivity','Class','Exposed','Sero Group','AA Position')) %>%
+                  select(-c('Alleles','Antibody Reactivity',
+                            'Class','Exposed','Sero Group',
+                            'AA Position')) %>%
                   as.data.frame() %>%
                   replace_with_colnames_and_col4() %>%
                   select(-1)  %>%
@@ -387,9 +410,12 @@ explex.frame <- explex.frame%>%
                   unique() %>%
                   .[. != 0] 
 
-pra.frame <- calculate_sum(df, pra$values, "PRA_sum", return.sum = F)
+pra.frame <- calculate_sum(df, pra$values, "PRA_sum", 
+                           return.sum = F)
 pra.frame <- pra.frame%>% 
-                  select(-c('Alleles','Antibody Reactivity','Class','Exposed','Sero Group','AA Position')) %>%
+                  select(-c('Alleles','Antibody Reactivity',
+                            'Class','Exposed','Sero Group',
+                            'AA Position')) %>%
                   as.data.frame() %>%
                   replace_with_colnames_and_col4() %>%
                   select(-1)  %>%
@@ -397,9 +423,12 @@ pra.frame <- pra.frame%>%
                   unique() %>%
                   .[. != 0] 
 
-mix.frame <- calculate_sum(df, mix$values, "MIX_sum", return.sum = F)
+mix.frame <- calculate_sum(df, mix$values, "MIX_sum", 
+                           return.sum = F)
 mix.frame <- mix.frame %>% 
-                  select(-c('Alleles','Antibody Reactivity','Class','Exposed','Sero Group','AA Position')) %>%
+                  select(-c('Alleles','Antibody Reactivity',
+                            'Class','Exposed','Sero Group',
+                            'AA Position')) %>%
                   as.data.frame() %>%
                   replace_with_colnames_and_col4() %>%
                   select(-1) %>%
@@ -437,7 +466,8 @@ upset_data <- upset_data[, c("ExPlex", "Mixed", "PRA", "SAB")]
 upset(
   upset_data,
   intersect = colnames(upset_data), # Now in alphabetical order
-  base_annotations = list('Number of Combined\nEplet-Antigens' = intersection_size()),
+  base_annotations = 
+    list('Number of Combined\nEplet-Antigens' = intersection_size()),
   sort_intersections_by='degree',
   themes = upset_default_themes(text = element_text(size = 12)), 
   set_sizes = FALSE, 
