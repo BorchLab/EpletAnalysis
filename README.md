@@ -4,7 +4,7 @@ Code repository for the analysis of commerical assays for HLA allele and eplet c
 
 ## Reproducible Code
 
-Available as a [pdf]([url](https://github.com/BorchLab/EpletAnalysis/blob/main/EpletWorkflow.pdf)) or via the [markdown]([url](https://github.com/BorchLab/EpletAnalysis/blob/main/EpletWorkflow.qmd))
+Available as a [pdf](https://github.com/BorchLab/EpletAnalysis/blob/main/EpletWorkflow.pdf) or via the [markdown](https://github.com/BorchLab/EpletAnalysis/blob/main/EpletWorkflow.qmd).
 
 The most important step before running the analysis is to ensure that the data is consistently formatted. Much of the functions are specific to the column names 
 and structure of the individual cells within the excel file or the document.
