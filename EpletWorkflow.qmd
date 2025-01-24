@@ -7,7 +7,7 @@ author:
 - name: Nick Borcherding
   email: borcherding.n@wustl.edu
   affiliation: Washington University in St. Louis, School of Medicine, St. Louis, MO, USA
-format: html
+format: pdf
 editor: visual
 ---
 
