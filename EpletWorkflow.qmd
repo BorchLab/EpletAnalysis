@@ -1,0 +1,522 @@
+---
+title: "Eplet Comparison Workflow"
+author: 
+- name: Patricia Hernandex
+  email: hernandez.p@wustl.edu
+  affiliation: Washington University in St. Louis, School of Medicine, St. Louis, MO, USA
+- name: Nick Borcherding
+  email: borcherding.n@wustl.edu
+  affiliation: Washington University in St. Louis, School of Medicine, St. Louis, MO, USA
+format: pdf
+editor: visual
+---
+
+## Loading Library
+
+This will load the libraries necessary to run the analysis. If the libraries/packages are not installed, this code will install them before loading them.
+
+```{r message = FALSE, warning = FALSE}
+required_libraries <- c(
+  "dplyr", "data.table", "tidyr", "janitor", "stringr", "venn",
+  "lubridate", "readxl", "openxlsx", "tidyverse", "hrbrthemes",
+  "proustr", "VennDiagram", "ComplexUpset"
+)
+
+# Function to check, install if needed, and load libraries
+load_libraries <- function(libraries) {
+  for (lib in libraries) {
+    if (!requireNamespace(lib, quietly = TRUE)) {
+      install.packages(lib, dependencies = TRUE)
+    }
+    library(lib, character.only = TRUE)
+  }
+}
+
+# Execute the function
+load_libraries(required_libraries)
+```
+
+## Loading Functions
+
+These are custom functions written for the analysis to assist in loading and plotting the data. More information can be found in the github repository under the R folder.
+
+```{r message = FALSE, warning = FALSE}
+source("./R/load_data.R")
+source("./R/utils.R")
+source("./R/calculate_sum.R")
+source("./R/generate_venn_diagram.R")
+source("./R/generate_upset_plot.R")
+source("./R/summarise_eplet.R")
+```
+
+## Data Formats
+
+The most important step before running the analysis is to ensure that the data is consistently formatted. Much of the functions are specific to the column names and structure of the individual cells within the excel file or the document.
+
+### SAB Assay
+
+```{r message = FALSE, warning = FALSE}
+SAB <- read_xlsx("data/SAB_Class_I_Lot_14_20221212.xlsx", sheet = 1)
+head(SAB)
+```
+
+### PRA Assay
+
+```{r message = FALSE, warning = FALSE}
+PRA <- read_xlsx("data/PRA_Class_I_Lot_020_20221212.xlsx", sheet = 1)
+head(PRA)
+```
+
+### Mix Assay
+
+```{r message = FALSE, warning = FALSE}
+Mix <- read_xlsx("data/LSM12NC23_024_01.xlsx", sheet = 1)
+head(Mix)
+```
+
+### ExPlex Assay
+
+```{r message = FALSE, warning = FALSE}
+ExPlex <- read_xlsx("data/ExPlex_classI_II.xlsx", sheet = 1)
+head(ExPlex)
+```
+
+## Figure 1: Allele Counting
+
+The following code will load all the assay information and automatically format them with the `load_XX_data()` functions. From there, we can count the alleles.
+
+### Class I Alleles
+
+```{r message = FALSE, warning = FALSE}
+sab <- process_sab_data(file = "./data/SAB_Class_I_Lot_14_20221212.xlsx", c(1,2)) 
+pra <- process_pra_data(file = "./data/PRA_Class_I_Lot_020_20221212.xlsx", 1) 
+mix <- process_mix_data(file = "./data/LSM12NC23_024_01.xlsx", 1) 
+explex <- process_explex_data(file = "./data/ExPlex_classI_II.xlsx", 1)
+
+#Remove non-type-I from Mix
+mix <- mix[grepl("A_|B_|C_", mix$values),]
+
+b <- list(
+  SAB = unique(sab$Molecular.Typing),
+  PRA = unique(pra$values),
+  Mixed = unique(mix$values),
+  ExPlex = unique(explex$Molecular.Typing)
+)
+
+# Create a binary membership matrix
+all_elements <- unique(unlist(b))
+membership_matrix <- data.frame(
+  element = all_elements,
+  SAB = all_elements %in% b$SAB,
+  PRA = all_elements %in% b$PRA,
+  Mixed = all_elements %in% b$Mix,
+  ExPlex = all_elements %in% b$ExPlex
+)
+
+# Convert logical values to binary
+membership_matrix <- membership_matrix %>%
+  select(element, ExPlex, Mixed, PRA, SAB)
+
+# Generate the UpSet plot
+upset_data <- membership_matrix %>% select(-element)
+
+upset_data <- upset_data[, c("ExPlex", "Mixed", "PRA", "SAB")]
+
+# Then specify the same order in the `intersect` argument:
+upset(
+  upset_data,
+  intersect = colnames(upset_data), # Now in alphabetical order
+  sort_intersections_by='degree',
+  base_annotations = list('Number of\nAntigens' = intersection_size()),
+  themes = upset_default_themes(text = element_text(size = 12)), 
+  set_sizes = FALSE, 
+  sort_sets = FALSE 
+) + 
+  theme(axis.title.x = element_blank())
+
+ggsave('outputs/viz/Figure1_ClassI.png', width = 8, height = 6)
+
+# Summarizing results for supplemental table
+summary_table <- membership_matrix %>%
+  pivot_longer(cols = -element, names_to = "Assay", values_to = "Present") %>%
+  filter(Present) %>%
+  group_by(element) %>%
+  summarize(Assay_Combination = paste(sort(Assay), collapse = "_")) %>%
+  group_by(Assay_Combination) %>%
+  summarize(
+    Allele_Count = n(),
+    Alleles = paste(sort(element), collapse = ", ")
+  ) %>%
+  arrange(desc(Allele_Count))
+write.csv(summary_table, "outputs/files/SupplementalTable1_ClassI_Allele_Overlap_Table.csv", row.names = FALSE)
+```
+
+### Class II Alleles
+
+```{r message = FALSE, warning = FALSE}
+sab <- process_sab_data(file = "./data/SAB_ClassII_Lot_15_20221212.xlsx", c(1:2))[-c(1:2),]
+pra <- process_pra_data(file = "./data/PRA_Class_II_Lot_019_20221212.xlsx", 1)
+mix <- process_mix_data(file = "./data/LSM12NC23_024_01.xlsx", 1) 
+explex <- process_explex_data(file = "./data/ExPlex_classI_II.xlsx", 2)
+
+#Remove type-I from Mix
+mix <- mix[!grepl("A_|B_|C_", mix$values),]
+
+b <- list(
+  SAB = unique(sab$Molecular.Typing),
+  PRA = unique(pra$values),
+  Mixed = unique(mix$values),
+  ExPlex = unique(explex$Molecular.Typing)
+)
+
+# Create a binary membership matrix
+all_elements <- unique(unlist(b))
+membership_matrix <- data.frame(
+  element = all_elements,
+  SAB = all_elements %in% b$SAB,
+  PRA = all_elements %in% b$PRA,
+  Mixed = all_elements %in% b$Mix,
+  ExPlex = all_elements %in% b$ExPlex
+)
+
+# Convert logical values to binary
+membership_matrix <- membership_matrix %>%
+  select(element, ExPlex, Mixed, PRA, SAB)
+
+# Generate the UpSet plot
+upset_data <- membership_matrix %>% select(-element)
+
+upset_data <- upset_data[, c("ExPlex", "Mixed", "PRA", "SAB")]
+
+# Then specify the same order in the `intersect` argument:
+upset(
+  upset_data,
+  intersect = colnames(upset_data),# Now in alphabetical order
+  sort_intersections_by='degree',
+  base_annotations = list('Number of\nAntigens' = intersection_size()),
+  themes = upset_default_themes(text = element_text(size = 12)), 
+  set_sizes = FALSE, 
+  sort_sets = FALSE 
+) + 
+  theme(axis.title.x = element_blank())
+
+ggsave('outputs/viz/Figure1_ClassII.png', width = 8, height = 6)
+
+# Summarizing results for supplemental table
+summary_table <- membership_matrix %>%
+  pivot_longer(cols = -element, names_to = "Assay", values_to = "Present") %>%
+  filter(Present) %>%
+  group_by(element) %>%
+  summarize(Assay_Combination = paste(sort(Assay), collapse = "_")) %>%
+  group_by(Assay_Combination) %>%
+  summarize(
+    Allele_Count = n(),
+    Alleles = paste(sort(element), collapse = ", ")
+  ) %>%
+  arrange(desc(Allele_Count))
+write.csv(summary_table, "outputs/files/SupplementalTable2_ClassII_Allele_Overlap_Table.csv", row.names = FALSE)
+```
+
+## Figure 2/3: Eplet Counting
+
+Here we are going to calculate the respective eplet load within the individual assays. For each assay, we use the `calculate_sum()` function to add up the unique eplets represented by the alleles within the assay.
+
+### Class I Eplets
+
+```{r message = FALSE, warning = FALSE}
+# Load and preprocess data
+df <- process_hla_registry(file = "./data/HMM-CL01-0620-CAT-00.xlsx", 1)
+sab <- process_sab_data(file = "./data/SAB_Class_I_Lot_14_20221212.xlsx", c(1,2))
+pra <- process_pra_data(file = "./data/PRA_Class_I_Lot_020_20221212.xlsx", 1)
+mix <- process_mix_data(file = "./data/LSM12NC23_024_01.xlsx", 1)
+explex <- process_explex_data(file = "./data/ExPlex_classI_II.xlsx", 1)
+
+# Add allele columns and calculate sums
+df <- calculate_sum(df, sab$Molecular.Typing, "SAB_unique")
+df <- calculate_sum(df, pra$values, "PRA_unique")
+df <- calculate_sum(df, mix$values, "Mix_unique")
+df <- calculate_sum(df, explex$Molecular.Typing, "EXPLEX_unique")
+
+# Generate Venn diagrams
+generate_venn_diagram(df, "outputs/viz/Figure2_classI.png", 
+                      pattern = "_unique")
+
+# Filter antibody-verified data and generate another Venn diagram
+dfa <- df %>% filter(`Antibody Reactivity` == "Confirmed")
+generate_venn_diagram(dfa, "outputs/viz/Figure3_classI.png", 
+                      pattern = "_unique")
+
+# Generating supplemental tables
+summary_table <- summarise_eplet(df)
+write.csv(summary_table, "outputs/files/SupplementalTable3_ClassI_Eplet_Overlap_Table.csv", row.names = FALSE)
+summary_table <- summarise_eplet(dfa)
+write.csv(summary_table, "outputs/files/SupplementalTable5_ClassI_Eplet_Overlap_Table_AbConfirmed.csv", row.names = FALSE)
+```
+
+```{r echo=FALSE, fig.height = 4, fig.width = 7}
+knitr::include_graphics("./outputs/viz/Figure2_classI.png")
+knitr::include_graphics("./outputs/viz/Figure3_classI.png")
+```
+
+### Class II Eplets
+
+```{r message = FALSE, warning = FALSE}
+df <- process_hla_registry(file = "./data/HMM-CL02-0620-CAT-00.xlsx", 1)
+sab <- process_sab_data(file = "./data/SAB_ClassII_Lot_15_20221212.xlsx", c(1:2))[-c(1:2),]
+pra <- process_pra_data(file = "./data/PRA_Class_II_Lot_019_20221212.xlsx", 1)
+mix <- process_mix_data(file = "./data/LSM12NC23_024_01.xlsx", 1)
+explex <- process_explex_data(file = "./data/ExPlex_classI_II.xlsx", 2)
+
+# Add allele columns and calculate sums
+df <- calculate_sum(df, sab$Molecular.Typing, "SAB_unique")
+df <- calculate_sum(df, pra$values, "PRA_unique")
+df <- calculate_sum(df, mix$values, "Mix_unique")
+df <- calculate_sum(df, explex$Molecular.Typing, "EXPLEX_unique")
+
+# Generate Venn diagrams
+generate_venn_diagram(df, "outputs/viz/Figure2_classII.png", pattern = "_unique")
+
+# Filter antibody-verified data and generate another Venn diagram
+dfa <- df %>% filter(`Antibody Reactivity` == "Confirmed")
+generate_venn_diagram(dfa, "outputs/viz/Figure3_classII.png", pattern = "_unique")
+
+# Generating supplemental tables
+summary_table <- summarise_eplet(df)
+write.csv(summary_table, "outputs/files/SupplementalTable4_ClassII_Eplet_Overlap_Table.csv", row.names = FALSE)
+summary_table <- summarise_eplet(dfa)
+write.csv(summary_table, "outputs/files/SupplementalTable6_ClassII_Eplet_Overlap_Table_AbConfirmed.csv", row.names = FALSE)
+```
+
+```{r echo=FALSE, fig.height = 4, fig.width = 7}
+knitr::include_graphics("./outputs/viz/Figure2_classII.png")
+knitr::include_graphics("./outputs/viz/Figure3_classII.png")
+```
+
+## Figure 4: Unique alleles mapped
+
+### Class I
+
+```{r message = FALSE, warning = FALSE}
+# Load and preprocess data
+df <- process_hla_registry(file = "./data/HMM-CL01-0620-CAT-00.xlsx", 1)
+sab <- process_sab_data(file = "./data/SAB_Class_I_Lot_14_20221212.xlsx", 
+                        c(1,2))
+pra <- process_pra_data(file = "./data/PRA_Class_I_Lot_020_20221212.xlsx", 1)
+mix <- process_mix_data(file = "./data/LSM12NC23_024_01.xlsx", 1)
+explex <- process_explex_data(file = "./data/ExPlex_classI_II.xlsx", 1)
+
+#Remove non-type-I from Mix
+mix <- mix[grepl("A_|B_|C_", mix$values),]
+
+#Making Data Frames
+sab.frame <- calculate_sum(df, sab$Molecular.Typing, "SAB_sum", 
+                           return.sum = FALSE)
+sab.frame <- sab.frame%>% 
+                  select(-c('Alleles','Antibody Reactivity',
+                            'Class','Exposed','Sero Group',
+                            'AA Position')) %>%
+                  as.data.frame() %>%
+                  replace_with_colnames_and_col4() %>%
+                  select(-1)  %>%
+                  unlist() %>%
+                  unique() %>%
+                  .[. != 0] 
+
+explex.frame <- calculate_sum(df, explex$Molecular.Typing, "EXPLEX_sum", 
+                              return.sum = F)
+explex.frame <- explex.frame%>% 
+                  select(-c('Alleles','Antibody Reactivity',
+                            'Class','Exposed','Sero Group',
+                            'AA Position')) %>%
+                  as.data.frame() %>%
+                  replace_with_colnames_and_col4() %>%
+                  select(-1)  %>%
+                  unlist() %>%
+                  unique() %>%
+                  .[. != 0] 
+
+pra.frame <- calculate_sum(df, pra$values, "PRA_sum", 
+                           return.sum = F)
+pra.frame <- pra.frame%>% 
+                  select(-c('Alleles','Antibody Reactivity',
+                            'Class','Exposed','Sero Group',
+                            'AA Position')) %>%
+                  as.data.frame() %>%
+                  replace_with_colnames_and_col4() %>%
+                  select(-1)  %>%
+                  unlist() %>%
+                  unique() %>%
+                  .[. != 0] 
+
+mix.frame <- calculate_sum(df, mix$values, "MIX_sum", 
+                           return.sum = F)
+mix.frame <- mix.frame %>% 
+                  select(-c('Alleles','Antibody Reactivity',
+                            'Class','Exposed','Sero Group',
+                            'AA Position')) %>%
+                  as.data.frame() %>%
+                  replace_with_colnames_and_col4() %>%
+                  select(-1) %>%
+                  unlist() %>%
+                  unique() %>%
+                  .[. != 0] 
+
+b=list(
+  SAB = sab.frame,
+  PRA = pra.frame,
+  Mixed = mix.frame,
+  ExPlex = explex.frame)
+
+# Create a binary membership matrix
+all_elements <- unique(unlist(b))
+membership_matrix <- data.frame(
+  element = all_elements,
+  SAB = all_elements %in% b$SAB,
+  PRA = all_elements %in% b$PRA,
+  Mixed = all_elements %in% b$Mix,
+  ExPlex = all_elements %in% b$ExPlex
+)
+
+
+# Convert logical values to binary
+membership_matrix <- membership_matrix %>%
+  select(element, ExPlex, Mixed, PRA, SAB)
+
+# Generate the UpSet plot
+upset_data <- membership_matrix %>% select(-element)
+
+upset_data <- upset_data[, c("ExPlex", "Mixed", "PRA", "SAB")]
+
+# Then specify the same order in the `intersect` argument:
+upset(
+  upset_data,
+  intersect = colnames(upset_data), # Now in alphabetical order
+  base_annotations = 
+    list('Number of Combined\nEplet-Antigens' = intersection_size()),
+  sort_intersections_by='degree',
+  themes = upset_default_themes(text = element_text(size = 12)), 
+  set_sizes = FALSE, 
+  sort_sets = FALSE 
+) + 
+  theme(axis.title.x = element_blank())
+
+ggsave('outputs/viz/Figure4_classI.png', width = 8, height = 6)
+
+```
+
+### Class II
+
+```{r message = FALSE, warning = FALSE}
+df <- process_hla_registry(file = "./data/HMM-CL02-0620-CAT-00.xlsx", 1)
+sab <- process_sab_data(file = "./data/SAB_ClassII_Lot_15_20221212.xlsx", 
+                        c(1:2))[-c(1:2),]
+pra <- process_pra_data(file = "./data/PRA_Class_II_Lot_019_20221212.xlsx", 1)
+mix <- process_mix_data(file = "./data/LSM12NC23_024_01.xlsx", 1)
+explex <- process_explex_data(file = "./data/ExPlex_classI_II.xlsx", 2)
+
+#Remove non-type-I from Mix
+mix <- mix[-grepl("A_|B_|C_", mix$values),]
+
+
+#Making Data Frames
+sab.frame <- calculate_sum(df, sab$Molecular.Typing, "SAB_sum", 
+                           return.sum = FALSE)
+sab.frame <- sab.frame%>% 
+                  select(-c('Alleles','Antibody Reactivity'
+                            ,'Class','Exposed','Sero Group',
+                            'AA Position')) %>%
+                  as.data.frame() %>%
+                  replace_with_colnames_and_col4() %>%
+                  select(-1)  %>%
+                  unlist() %>%
+                  unique() %>%
+                  .[. != 0] 
+
+explex.frame <- calculate_sum(df, explex$Molecular.Typing, "EXPLEX_sum", 
+                              return.sum = F)
+explex.frame <- explex.frame%>% 
+                  select(-c('Alleles','Antibody Reactivity',
+                            'Class','Exposed','Sero Group',
+                            'AA Position')) %>%
+                  as.data.frame() %>%
+                  replace_with_colnames_and_col4() %>%
+                  select(-1)  %>%
+                  unlist() %>%
+                  unique() %>%
+                  .[. != 0] 
+
+pra.frame <- calculate_sum(df, pra$values, "PRA_sum", 
+                           return.sum = F)
+pra.frame <- pra.frame%>% 
+                  select(-c('Alleles','Antibody Reactivity',
+                            'Class','Exposed','Sero Group',
+                            'AA Position')) %>%
+                  as.data.frame() %>%
+                  replace_with_colnames_and_col4() %>%
+                  select(-1)  %>%
+                  unlist() %>%
+                  unique() %>%
+                  .[. != 0] 
+
+mix.frame <- calculate_sum(df, mix$values, "MIX_sum", 
+                           return.sum = F)
+mix.frame <- mix.frame %>% 
+                  select(-c('Alleles','Antibody Reactivity',
+                            'Class','Exposed','Sero Group',
+                            'AA Position')) %>%
+                  as.data.frame() %>%
+                  replace_with_colnames_and_col4() %>%
+                  select(-1) %>%
+                  unlist() %>%
+                  unique() %>%
+                  .[. != 0] 
+
+b=list(
+  SAB = sab.frame,
+  PRA = pra.frame,
+  Mixed = mix.frame,
+  ExPlex = explex.frame)
+
+# Create a binary membership matrix
+all_elements <- unique(unlist(b))
+membership_matrix <- data.frame(
+  element = all_elements,
+  SAB = all_elements %in% b$SAB,
+  PRA = all_elements %in% b$PRA,
+  Mixed = all_elements %in% b$Mix,
+  ExPlex = all_elements %in% b$ExPlex
+)
+
+
+# Convert logical values to binary
+membership_matrix <- membership_matrix %>%
+  select(element, ExPlex, Mixed, PRA, SAB)
+
+# Generate the UpSet plot
+upset_data <- membership_matrix %>% select(-element)
+
+upset_data <- upset_data[, c("ExPlex", "Mixed", "PRA", "SAB")]
+
+# Then specify the same order in the `intersect` argument:
+upset(
+  upset_data,
+  intersect = colnames(upset_data), # Now in alphabetical order
+  base_annotations = 
+    list('Number of Combined\nEplet-Antigens' = intersection_size()),
+  sort_intersections_by='degree',
+  themes = upset_default_themes(text = element_text(size = 12)), 
+  set_sizes = FALSE, 
+  sort_sets = FALSE 
+) + 
+  theme(axis.title.x = element_blank())
+
+ggsave('outputs/viz/Figure4_classII.png', width = 8, height = 6)
+```
+
+## Conclusion
+
+Here is the comprehensive summary and code of the analysis performed. The following package versions may be helpful in recreating the analysis or making your own.
+
+```{r}
+sessionInfo()
+```
