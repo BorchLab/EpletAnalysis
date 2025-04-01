@@ -1,12 +1,13 @@
 ---
 title: "Eplet Comparison Workflow"
 author: 
-- name: Patricia Hernandex
+- name: Patricia Hernandez
   email: hernandez.p@wustl.edu
   affiliation: Washington University in St. Louis, School of Medicine, St. Louis, MO, USA
 - name: Nick Borcherding
   email: borcherding.n@wustl.edu
   affiliation: Washington University in St. Louis, School of Medicine, St. Louis, MO, USA
+date: 'Compiled: `r format(Sys.Date(), "%B %d, %Y")`'
 format: pdf
 editor: visual
 ---
