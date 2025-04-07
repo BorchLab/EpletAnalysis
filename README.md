@@ -17,7 +17,6 @@ and structure of the individual cells within the excel file or the document.
 ├── EpletWorkflow.html   Rendered HTML output of the main workflow
 ├── outputs/             Table and visualizations
 ├── R/                   Custom R functions to perform the analysis
-├── SupplMaterial.qmd    Supplementary material source in Quarto markdown
 └── README.md            Description and setup instructions for the repository
 ```
 
