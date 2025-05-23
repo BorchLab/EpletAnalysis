@@ -226,7 +226,7 @@ Here we are going to calculate the respective eplet load within the individual a
 
 ```{r message = FALSE, warning = FALSE}
 # Load and preprocess data
-df <- process_hla_registry(file = "./data/HMM-CL01-0620-CAT-00.xlsx", 1)
+df <- read.csv("./data/EpletRegistry_ClassI.csv")
 sab <- process_sab_data(file = "./data/SAB_Class_I_Lot_14_20221212.xlsx", c(1,2))
 pra <- process_pra_data(file = "./data/PRA_Class_I_Lot_020_20221212.xlsx", 1)
 mix <- process_mix_data(file = "./data/LSM12NC23_024_01.xlsx", 1)
@@ -262,7 +262,7 @@ knitr::include_graphics("./outputs/viz/Figure3_classI.png")
 ### Class II Eplets
 
 ```{r message = FALSE, warning = FALSE}
-df <- process_hla_registry(file = "./data/HMM-CL02-0620-CAT-00.xlsx", 1)
+df <- read.csv("./data/EpletRegistry_ClassII.csv")
 sab <- process_sab_data(file = "./data/SAB_ClassII_Lot_15_20221212.xlsx", c(1:2))[-c(1:2),]
 pra <- process_pra_data(file = "./data/PRA_Class_II_Lot_019_20221212.xlsx", 1)
 mix <- process_mix_data(file = "./data/LSM12NC23_024_01.xlsx", 1)
@@ -299,7 +299,7 @@ knitr::include_graphics("./outputs/viz/Figure3_classII.png")
 
 ```{r message = FALSE, warning = FALSE}
 # Load and preprocess data
-df <- process_hla_registry(file = "./data/HMM-CL01-0620-CAT-00.xlsx", 1)
+df <- read.csv("./data/EpletRegistry_ClassI.csv")
 sab <- process_sab_data(file = "./data/SAB_Class_I_Lot_14_20221212.xlsx", 
                         c(1,2))
 pra <- process_pra_data(file = "./data/PRA_Class_I_Lot_020_20221212.xlsx", 1)
@@ -408,7 +408,7 @@ ggsave('outputs/viz/Figure4_classI.png', width = 8, height = 6)
 ### Class II
 
 ```{r message = FALSE, warning = FALSE}
-df <- process_hla_registry(file = "./data/HMM-CL02-0620-CAT-00.xlsx", 1)
+df <- read.csv("./data/EpletRegistry_ClassII.csv")
 sab <- process_sab_data(file = "./data/SAB_ClassII_Lot_15_20221212.xlsx", 
                         c(1:2))[-c(1:2),]
 pra <- process_pra_data(file = "./data/PRA_Class_II_Lot_019_20221212.xlsx", 1)

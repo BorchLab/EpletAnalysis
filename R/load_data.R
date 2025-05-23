@@ -93,19 +93,6 @@ process_explex_data <- function(file, sheet) {
   
   return(explex)
 }
-  
-#' @title Process HLA Registry Data
-#' @description Loads and cleans HLA registry data.
-process_hla_registry <- function(file, sheet) {
-    df <- read_and_clean_excel(file, sheet)
-    df <- df %>%
-      rowwise() %>%
-      mutate(Alleles = paste(unique(na.omit(c_across(10:ncol(df)))), collapse = ",")) %>%
-      ungroup() %>%
-      select(`AA Position`, `Epitope Name`, Alleles, `Antibody Reactivity`, 
-             Class, Exposed, `Sero Group`)
-    return(df)
-}
 
 #' @title Read and Preprocess Excel Data
 #' @description Load data from an Excel file and clean HLA alleles.
