@@ -301,7 +301,7 @@ write.csv(summary_table, "outputs/files/SupplementalTable6_ClassII_Eplet_Overlap
 
 ```{r echo=FALSE, fig.height = 4, fig.width = 7}
 knitr::include_graphics("./outputs/viz/Figure2_classII.svg")
-knitr::include_graphics("./outputs/viz/Figure3_classII.svg")
+knitr::include_graphics("./outputs/viz/Figure2_classII.svg")
 ```
 
 # Figure 3: SAB Comparisons
@@ -342,16 +342,18 @@ OL_ClassII_sab$`Molecular Typing` <- gsub("[*]", "_", OL_ClassII_sab$`Molecular 
 
 
 # Plot Overlap and Loci 
-plot_sab_overlap(LC_ClassII_sab$Molecular.Typing,
-                 OL_ClassII_sab$`Molecular Typing`, 
+plot_sab_overlap(unlist(str_split(gsub("\\s+", "", LC_ClassII_sab$Molecular.Typing), ",")),
+                 unlist(str_split(gsub("\\s+", "", OL_ClassII_sab$`Molecular Typing`), ",")),
                  prefix_len = 2)
 ggsave('outputs/viz/Figure3_classII.pdf', width = 8, height = 6)
 
 # Performing Eplet Analysis
 df <- read.csv("./data/EpletRegistry_ClassII.csv")
-df <- calculate_sum(df, OL_ClassII_sab$Molecular.Typing, "OL_unique")
-df <- calculate_sum(df, LC_ClassII_sab$Molecular.Typing, "LC_unique")
+df <- calculate_sum(df, unlist(str_split(gsub("\\s+", "", LC_ClassII_sab$Molecular.Typing), ",")), "OL_unique")
+df <- calculate_sum(df, unlist(str_split(gsub("\\s+", "", OL_ClassII_sab$`Molecular Typing`), ",")), "LC_unique")
 
+
+          
 plot_eplet_overlap(df$OL_unique,
                    df$LC_unique,
                    n1         = "LABScreen",
